@@ -11,7 +11,7 @@ class FinancialNews extends StatelessWidget {
         shrinkWrap: true,
         itemCount: 3,
         separatorBuilder: (context, index) => const Divider(),
-        itemBuilder: ((context, index) => Container(
+        itemBuilder: ((context, index) => SizedBox(
               child: Row(
                 children: [
                   SizedBox(

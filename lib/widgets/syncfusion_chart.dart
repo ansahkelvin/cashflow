@@ -18,9 +18,12 @@ class _SFChartState extends State<SFChart> {
       height: 200,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
-          // color: Colors.white,
-          borderRadius: BorderRadius.circular(12)),
-      child: SfCartesianChart(),
+        // color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SfCartesianChart(
+        selectionType: SelectionType.series,
+      ),
     );
   }
 }
