@@ -1,4 +1,8 @@
+import 'package:budget/pages/add_money.dart';
+import 'package:budget/pages/create_budget.dart';
+import 'package:budget/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AccountSettings extends StatelessWidget {
   const AccountSettings({
@@ -7,6 +11,7 @@ class AccountSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<FirebaseProvider>(context);
     return SizedBox(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,9 +27,9 @@ class AccountSettings extends StatelessWidget {
           const SizedBox(
             height: 15,
           ),
-          const Text(
-            "\$625,000",
-            style: TextStyle(
+          Text(
+            "GHC ${provider.balance}",
+            style: const TextStyle(
               color: Color(0xff181818),
               fontSize: 26,
               fontWeight: FontWeight.w500,
@@ -35,34 +40,54 @@ class AccountSettings extends StatelessWidget {
           ),
           Row(
             children: [
-              Container(
-                height: 40,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(157, 33, 149, 243),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Deposit",
-                    style: TextStyle(color: Colors.white),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const AddMoney(),
+                      fullscreenDialog: true,
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 40,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff174123),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Deposit",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(
                 width: 20,
               ),
-              Container(
-                height: 40,
-                width: 120,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(157, 33, 149, 243),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text(
-                    "Create budget",
-                    style: TextStyle(color: Colors.white),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const TrackExpense(),
+                      fullscreenDialog: true,
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 40,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff174123),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Account Expense",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ),

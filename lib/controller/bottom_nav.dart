@@ -2,17 +2,28 @@ import 'package:budget/pages/currency_conversion.dart';
 import 'package:budget/pages/financial_news.dart';
 import 'package:budget/pages/home_page.dart';
 import 'package:budget/pages/profile.dart';
+import 'package:budget/provider/auth_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BottomNavigator extends StatefulWidget {
   const BottomNavigator({super.key});
+  static const String routeName = "/nav";
 
   @override
   State<BottomNavigator> createState() => _BottomNavigatorState();
 }
 
 class _BottomNavigatorState extends State<BottomNavigator> {
+  @override
+  void initState() {
+    Provider.of<FirebaseProvider>(context, listen: false).getUserData();
+    Provider.of<FirebaseProvider>(context, listen: false).fetchTransactions();
+
+    super.initState();
+  }
+
   int _currentIndex = 0;
   final List<Widget> _pages = const [
     HomePage(),
@@ -37,7 +48,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
           BottomNavigationBarItem(
             activeIcon: Icon(
               CupertinoIcons.home,
-              color: Color.fromARGB(157, 33, 149, 243),
+              color: Color(0xff174123),
             ),
             icon: Icon(
               CupertinoIcons.home,
@@ -46,10 +57,8 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             label: "",
           ),
           BottomNavigationBarItem(
-            activeIcon: Icon(
-              CupertinoIcons.creditcard,
-              color: Color.fromARGB(157, 33, 149, 243),
-            ),
+            activeIcon:
+                Icon(CupertinoIcons.creditcard, color: Color(0xff174123)),
             icon: Icon(
               CupertinoIcons.creditcard,
               color: Colors.grey,
@@ -57,10 +66,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             label: "",
           ),
           BottomNavigationBarItem(
-            activeIcon: Icon(
-              CupertinoIcons.bookmark,
-              color: Color.fromARGB(157, 33, 149, 243),
-            ),
+            activeIcon: Icon(CupertinoIcons.bookmark, color: Color(0xff174123)),
             icon: Icon(
               CupertinoIcons.bookmark,
               color: Colors.grey,
@@ -70,7 +76,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
           BottomNavigationBarItem(
             activeIcon: Icon(
               CupertinoIcons.person,
-              color: Color.fromARGB(157, 33, 149, 243),
+              color: Color(0xff174123),
             ),
             icon: Icon(
               CupertinoIcons.person,

@@ -30,7 +30,7 @@ class TransactionWidget extends StatelessWidget {
                 ),
                 Text(
                   "See All",
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: Color(0xff174123)),
                 ),
               ],
             ),
@@ -38,8 +38,6 @@ class TransactionWidget extends StatelessWidget {
               height: 30,
             ),
             const TransactionListTile(),
-            const TransactionListTile(),
-            const TransactionListTile()
           ],
         ),
       ),
