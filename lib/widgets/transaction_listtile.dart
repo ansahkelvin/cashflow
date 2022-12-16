@@ -1,65 +1,35 @@
-import 'package:budget/provider/auth_provider.dart';
+import 'package:budget/model/transaction.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class TransactionListTile extends StatelessWidget {
-  const TransactionListTile({
-    Key? key,
-  }) : super(key: key);
+class TransactionTile extends StatefulWidget {
+  const TransactionTile({Key? key, required this.transaction})
+      : super(key: key);
+
+  final TransactionModel transaction;
 
   @override
+  State<TransactionTile> createState() => _TransactionTileState();
+}
+
+class _TransactionTileState extends State<TransactionTile> {
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: Provider.of<FirebaseProvider>(context).fetchTransactions(),
-        builder: (context, snapshot) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: const Icon(
-                          Icons.credit_card,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "Upwork",
-                            style: TextStyle(color: Colors.black87),
-                          ),
-                          Text(
-                            "Work 15 Feb",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  const Text(
-                    "+\$10,00",
-                    style: TextStyle(color: Colors.green),
-                  ),
-                ],
-              ),
-              const Divider(),
-            ],
-          );
-        });
+    return ListTile(
+      title: Text(
+        widget.transaction.source,
+        style: const TextStyle(color: Colors.black87),
+      ),
+      subtitle: Text(
+        widget.transaction.date,
+        style: const TextStyle(color: Colors.grey),
+      ),
+      trailing: Text(
+        "GHC ${widget.transaction.type == "deduct" ? "-" : "+"}${widget.transaction.amount}",
+        style: TextStyle(
+          color:
+              widget.transaction.type == "deduct" ? Colors.red : Colors.green,
+        ),
+      ),
+    );
   }
 }

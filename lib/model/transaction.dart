@@ -10,13 +10,13 @@ class TransactionModel {
   TransactionModel.fromJson(Map<String, Object?> json)
       : this(
           date: json['date']! as String,
-          amount: json['amount']! as double,
+          amount: json['amount']! as String,
           time: json['time'] as String,
           type: json['type'] as String,
           source: json['source'] as String,
         );
 
-  final double amount;
+  final String amount;
   final String date;
   final String source;
   final String time;

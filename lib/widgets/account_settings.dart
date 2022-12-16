@@ -1,5 +1,5 @@
 import 'package:budget/pages/add_money.dart';
-import 'package:budget/pages/create_budget.dart';
+import 'package:budget/pages/create_expense.dart';
 import 'package:budget/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

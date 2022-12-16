@@ -1,30 +1,105 @@
+import 'package:budget/model/blog.dart';
+import 'package:budget/pages/view_blog.dart';
+import 'package:budget/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class FinancialNews extends StatelessWidget {
+class FinancialNews extends StatefulWidget {
   const FinancialNews({super.key});
 
   @override
+  State<FinancialNews> createState() => _FinancialNewsState();
+}
+
+class _FinancialNewsState extends State<FinancialNews> {
+  late Future<Blog> fetchBlog;
+  @override
+  void initState() {
+    fetchBlog =
+        Provider.of<FirebaseProvider>(context, listen: false).fetchBlogs();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<FirebaseProvider>(context).blogList;
     return Padding(
       padding: const EdgeInsets.all(18),
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: 3,
-        separatorBuilder: (context, index) => const Divider(),
-        itemBuilder: ((context, index) => SizedBox(
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 100,
-                    width: 100,
-                    child: Image.network(
-                        "https://images.unsplash.com/photo-1661956601349-f61c959a8fd4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2942&q=80"),
-                  ),
-                  const Text("Mailchimp"),
-                ],
-              ),
-            )),
-      ),
+      child: FutureBuilder<Blog>(
+          future: fetchBlog,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.separated(
+                physics: const ScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: provider.length,
+                separatorBuilder: (context, index) => const Divider(),
+                itemBuilder: ((context, index) => GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: ((context) =>
+                                ViewBlog(blog: provider[index])),
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 250,
+                              width: MediaQuery.of(context).size.width,
+                              child: Image.network(
+                                provider[index].imgUrl,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                              height: 30,
+                            ),
+                            SizedBox(
+                              height: 150,
+                              width: MediaQuery.of(context).size.width,
+                              child: Wrap(
+                                children: [
+                                  ListTile(
+                                    title: Wrap(
+                                      children: [
+                                        Text(
+                                          provider[index].title,
+                                          softWrap: true,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    subtitle: Text(
+                                      provider[index].description,
+                                      maxLines: 5,
+                                      softWrap: true,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+              );
+            }
+            return const Center(child: CircularProgressIndicator());
+          }),
     );
   }
 }

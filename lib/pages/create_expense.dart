@@ -1,26 +1,41 @@
 import 'package:budget/provider/auth_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class AddMoney extends StatefulWidget {
-  const AddMoney({super.key});
+class TrackExpense extends StatefulWidget {
+  const TrackExpense({super.key});
 
   @override
-  State<AddMoney> createState() => _AddMoneyState();
+  State<TrackExpense> createState() => _TrackExpenseState();
 }
 
-class _AddMoneyState extends State<AddMoney> {
+class _TrackExpenseState extends State<TrackExpense> {
   final amountController = TextEditingController();
-  final sourceController = TextEditingController();
+  final itemController = TextEditingController();
   final key = GlobalKey<FormState>();
+  DateTime? date = DateTime.now();
   bool isLoading = false;
 
   @override
   void dispose() {
     amountController.dispose();
-    sourceController.dispose();
+    itemController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: date!,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime.now());
+    if (picked != null && picked != date) {
+      setState(() {
+        date = picked;
+      });
+    }
   }
 
   bool validate() {
@@ -32,17 +47,19 @@ class _AddMoneyState extends State<AddMoney> {
     return false;
   }
 
-  Future<void> addMoney() async {
+  Future<void> expense() async {
     final provider = Provider.of<FirebaseProvider>(context, listen: false);
     if (validate()) {
       setState(() {
         isLoading = true;
       });
       try {
-        await provider.setBalance(amountController.text);
-        await provider.getUserData();
+        await provider.setDeductBalance(amountController.text);
         await provider.addTransaction(
-            amountController.text, sourceController.text, "add");
+            amountController.text, itemController.text, "deduct");
+        await provider.addExpense(amountController.text, itemController.text,
+            DateFormat.yMMMEd().format(date!));
+        await provider.getUserData();
         setState(() {
           isLoading = false;
         });
@@ -108,6 +125,19 @@ class _AddMoneyState extends State<AddMoney> {
                 TextFormField(
                   validator: ((value) =>
                       value!.isEmpty ? "Cannot be empty" : null),
+                  controller: itemController,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Item title",
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
+                  validator: ((value) =>
+                      value!.isEmpty ? "Cannot be empty" : null),
                   controller: amountController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
@@ -118,15 +148,16 @@ class _AddMoneyState extends State<AddMoney> {
                 const SizedBox(
                   height: 20,
                 ),
-                TextFormField(
-                  validator: ((value) =>
-                      value!.isEmpty ? "Cannot be empty" : null),
-                  controller: sourceController,
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Source of Income",
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(date != null
+                        ? DateFormat.yMMMEd().format(DateTime.now())
+                        : "Selected Date"),
+                    IconButton(
+                        onPressed: () => _selectDate(context),
+                        icon: const Icon(Icons.calendar_month_outlined))
+                  ],
                 ),
                 const SizedBox(
                   height: 80,
@@ -139,9 +170,9 @@ class _AddMoneyState extends State<AddMoney> {
                       50,
                     ),
                   ),
-                  onPressed: addMoney,
+                  onPressed: expense,
                   child: Text(
-                    isLoading ? "Processing" : "Add Money",
+                    isLoading ? "Processing" : "Create Expense",
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),

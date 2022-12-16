@@ -1,3 +1,5 @@
+import 'package:budget/model/blog.dart';
+import 'package:budget/model/expense.dart';
 import 'package:budget/model/transaction.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,12 +10,20 @@ import 'package:intl/intl.dart';
 class AuthBase {}
 
 class FirebaseProvider with ChangeNotifier {
-  List transactionList = [];
+  List<TransactionModel> transactionList = [];
+  List<Expense> expenseList = [];
+  List<Blog> blogList = [];
+
+  TransactionModel transaction =
+      TransactionModel(amount: "", date: "", source: "", time: "", type: "");
+  Expense expense = Expense(title: "", amount: "", date: "");
+  Blog blog = Blog(id: "", title: "", description: "", imgUrl: "");
 
   String? name;
   String? email;
-  double? balance;
+  String? balance;
   String? userId;
+
   final firebase = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
   final currentUser = FirebaseAuth.instance.currentUser;
@@ -48,7 +58,15 @@ class FirebaseProvider with ChangeNotifier {
   }
 
   Future<void> setBalance(String amount) async {
-    final newAmount = balance! + double.parse(amount);
+    final newAmount = double.parse(balance!) + double.parse(amount);
+    await firestore.doc("users/${currentUser!.uid}").update({
+      "balance": newAmount,
+    });
+    notifyListeners();
+  }
+
+  Future<void> setDeductBalance(String amount) async {
+    final newAmount = double.parse(balance!) - double.parse(amount);
     await firestore.doc("users/${currentUser!.uid}").update({
       "balance": newAmount,
     });
@@ -66,14 +84,61 @@ class FirebaseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchTransactions() async {
-    await firestore
+  Future<TransactionModel> fetchTransactions() async {
+    final snapshots = await firestore
         .collection("users/${currentUser!.uid}/transactions")
-        .withConverter(
-            fromFirestore: (snapshot, _) =>
-                TransactionModel.fromJson(snapshot.data()!),
-            toFirestore: (transaction, _) => transaction.toJson())
         .get();
+    final data = snapshots.docs
+        .map((doc) => TransactionModel(
+              date: doc.data()["date"],
+              amount: doc.data()["amount"],
+              source: doc.data()["source"],
+              time: doc.id,
+              type: doc.data()["type"],
+            ))
+        .toList();
+    transactionList = data;
+    notifyListeners();
+    return transaction;
+  }
+
+  Future<void> addExpense(String amount, String item, String date) async {
+    await firestore.collection("users/${currentUser!.uid}/expenses").add({
+      "amount": amount,
+      "itemTitle": item,
+      "date": date,
+    });
+    notifyListeners();
+  }
+
+  Future<Expense> fetchExpense() async {
+    final snapshot =
+        await firestore.collection("users/${currentUser!.uid}/expenses").get();
+    final data = snapshot.docs
+        .map((doc) => Expense(
+              date: doc.data()["date"],
+              amount: doc.data()["amount"],
+              title: doc.data()["title"],
+            ))
+        .toList();
+    expenseList = data;
+    notifyListeners();
+    return expense;
+  }
+
+  Future<Blog> fetchBlogs() async {
+    final snapshots = await firestore.collection("blog").get();
+    final data = snapshots.docs
+        .map((doc) => Blog(
+              id: doc.id,
+              title: doc.data()["title"],
+              imgUrl: doc.data()["imgUrl"],
+              description: doc.data()["description"],
+            ))
+        .toList();
+    blogList = data;
+    notifyListeners();
+    return blog;
   }
 
   Future<void> getUserData() async {
@@ -81,11 +146,7 @@ class FirebaseProvider with ChangeNotifier {
     final data = snapshot.data() as Map<String, dynamic>;
     name = data["name"];
     email = data["email"];
-    balance = data["balance"];
+    balance = data["balance"].toString();
     notifyListeners();
   }
-
-  
-
-  
 }

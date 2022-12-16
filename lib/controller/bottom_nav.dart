@@ -1,4 +1,4 @@
-import 'package:budget/pages/currency_conversion.dart';
+import 'package:budget/pages/create_budget.dart';
 import 'package:budget/pages/financial_news.dart';
 import 'package:budget/pages/home_page.dart';
 import 'package:budget/pages/profile.dart';
@@ -27,7 +27,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   int _currentIndex = 0;
   final List<Widget> _pages = const [
     HomePage(),
-    CurrencyConversion(),
+    CreateBudget(),
     FinancialNewsPage(),
     ProfilePage(),
   ];

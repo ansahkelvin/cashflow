@@ -1,3 +1,4 @@
+import 'package:budget/widgets/financial_news.dart';
 import 'package:flutter/material.dart';
 
 class FinancialNewsPage extends StatelessWidget {
@@ -10,6 +11,10 @@ class FinancialNewsPage extends StatelessWidget {
         title: const Text("Finance Blog"),
         centerTitle: false,
       ),
+      body: SingleChildScrollView(
+          child: Column(
+        children: const [FinancialNews()],
+      )),
     );
   }
 }
