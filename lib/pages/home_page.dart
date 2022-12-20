@@ -1,3 +1,4 @@
+import 'package:budget/pages/check_user_logged_In.dart';
 import 'package:budget/provider/auth_provider.dart';
 import 'package:budget/widgets/syncfusion_chart.dart';
 import 'package:budget/widgets/transaction_widget.dart';
@@ -18,11 +19,13 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text("Cashflow"),
         actions: [
           IconButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushReplacementNamed(CheckUser.routeName);
             },
             icon: const Icon(Icons.logout_outlined),
           ),
@@ -41,7 +44,13 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
             children: const [
               AccountSettings(),
+              SizedBox(
+                height: 40,
+              ),
               SFChart(),
+              SizedBox(
+                height: 40,
+              ),
               TransactionWidget(),
             ],
           ),

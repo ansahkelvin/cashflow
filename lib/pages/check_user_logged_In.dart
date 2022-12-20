@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class CheckUser extends StatefulWidget {
   const CheckUser({super.key});
+  static const String routeName = "/check";
 
   @override
   State<CheckUser> createState() => _CheckUserState();

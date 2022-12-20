@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
               const BottomNavigator(),
           LoginPage.routeName: (BuildContext context) => const LoginPage(),
           RegisterPage.routeName: (context) => const RegisterPage(),
+          CheckUser.routeName: (context) => const CheckUser(),
         },
       ),
     );

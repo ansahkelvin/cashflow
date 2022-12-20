@@ -184,12 +184,16 @@ class FirebaseProvider with ChangeNotifier {
   }
 
   Future<void> getUserData() async {
-    final snapshot = await firestore.doc("users/${currentUser!.uid}").get();
-    final data = snapshot.data() as Map<String, dynamic>;
-    name = data["name"];
-    email = data["email"];
-    balance = data["balance"].toString();
-    notifyListeners();
+    try {
+      final snapshot = await firestore.doc("users/${currentUser!.uid}").get();
+      final data = snapshot.data() as Map<String, dynamic>;
+      name = data["name"];
+      email = data["email"];
+      balance = data["balance"].toString();
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> editUserData(String name) async {

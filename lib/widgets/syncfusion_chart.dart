@@ -30,9 +30,7 @@ class _SFChartState extends State<SFChart> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return expenseList.isEmpty
-                ? const PieChart(
-                    dataMap: {"No data": 0},
-                  )
+                ? Container()
                 : Container(
                     margin: const EdgeInsets.only(top: 40, bottom: 40),
                     height: 200,
@@ -49,9 +47,7 @@ class _SFChartState extends State<SFChart> {
                     ),
                   );
           }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return Container();
         });
   }
 }
