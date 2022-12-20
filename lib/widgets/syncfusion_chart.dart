@@ -1,3 +1,4 @@
+import 'package:budget/model/expense.dart';
 import 'package:budget/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
@@ -11,22 +12,46 @@ class SFChart extends StatefulWidget {
 }
 
 class _SFChartState extends State<SFChart> {
+  late Future<Expense> fetchExpense;
+
+  @override
+  void initState() {
+    fetchExpense =
+        Provider.of<FirebaseProvider>(context, listen: false).fetchExpense();
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FirebaseProvider>(context);
-    return FutureBuilder(
-        future: provider.fetchTransactions(),
+    final expenseList = Provider.of<FirebaseProvider>(context).expenseList;
+    return FutureBuilder<Expense>(
+        future: fetchExpense,
         builder: (context, snapshot) {
-          // final data = snapshot.data!.docs as Map<String, dynamic>;
-          return Container(
-              margin: const EdgeInsets.only(top: 40, bottom: 40),
-              height: 200,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                // color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const PieChart(dataMap: {"Food": 21}));
+          if (snapshot.hasData) {
+            return expenseList.isEmpty
+                ? const PieChart(
+                    dataMap: {"No data": 0},
+                  )
+                : Container(
+                    margin: const EdgeInsets.only(top: 40, bottom: 40),
+                    height: 200,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      // color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: PieChart(
+                      dataMap: {
+                        for (var e in expenseList)
+                          e.title: double.parse(e.amount)
+                      },
+                    ),
+                  );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         });
   }
 }

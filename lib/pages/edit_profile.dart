@@ -13,6 +13,16 @@ class EditProfileForm extends StatefulWidget {
 }
 
 class _EditProfileFormState extends State<EditProfileForm> {
+  final nameController = TextEditingController();
+  bool isLoading = false;
+  @override
+  void initState() {
+    final provider = Provider.of<FirebaseProvider>(context, listen: false);
+    nameController.text = provider.name!;
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<FirebaseProvider>(context);
@@ -20,7 +30,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
     return Column(
       children: [
         TextFormField(
-          initialValue: provider.name,
+          controller: nameController,
           decoration: const InputDecoration(
             prefixIcon: Icon(
               Icons.person_outline,
@@ -34,6 +44,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
         ),
         TextFormField(
           initialValue: provider.email,
+          readOnly: true,
           decoration: const InputDecoration(
             prefixIcon: Icon(
               Icons.mail,
@@ -46,6 +57,9 @@ class _EditProfileFormState extends State<EditProfileForm> {
           height: 20,
         ),
         TextFormField(
+          readOnly: true,
+          obscureText: true,
+          initialValue: "password",
           decoration: const InputDecoration(
             prefixIcon: Icon(
               Icons.lock_outline,
@@ -58,17 +72,26 @@ class _EditProfileFormState extends State<EditProfileForm> {
           height: 20,
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () async {
+            setState(() {
+              isLoading = true;
+            });
+            await provider.editUserData(nameController.text);
+            await provider.getUserData();
+            setState(() {
+              isLoading = false;
+            });
+          },
           child: Container(
             height: 53,
             width: double.infinity,
             decoration: const BoxDecoration(
               color: Color(0xff0B1116),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                "Save",
-                style: TextStyle(
+                isLoading ? "Saving Changes" : "Save",
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                 ),

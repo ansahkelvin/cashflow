@@ -7,16 +7,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../model/budget.dart';
+
 class AuthBase {}
 
 class FirebaseProvider with ChangeNotifier {
   List<TransactionModel> transactionList = [];
   List<Expense> expenseList = [];
+  List<Budget> budgetList = [];
+
   List<Blog> blogList = [];
 
   TransactionModel transaction =
       TransactionModel(amount: "", date: "", source: "", time: "", type: "");
   Expense expense = Expense(title: "", amount: "", date: "");
+  Budget budget = Budget(id: "", title: "", amount: "", date: "");
+
   Blog blog = Blog(id: "", title: "", description: "", imgUrl: "");
 
   String? name;
@@ -87,6 +93,7 @@ class FirebaseProvider with ChangeNotifier {
   Future<TransactionModel> fetchTransactions() async {
     final snapshots = await firestore
         .collection("users/${currentUser!.uid}/transactions")
+        .orderBy('date', descending: true)
         .get();
     final data = snapshots.docs
         .map((doc) => TransactionModel(
@@ -116,14 +123,41 @@ class FirebaseProvider with ChangeNotifier {
         await firestore.collection("users/${currentUser!.uid}/expenses").get();
     final data = snapshot.docs
         .map((doc) => Expense(
-              date: doc.data()["date"],
+              title: doc.data()["itemTitle"],
               amount: doc.data()["amount"],
-              title: doc.data()["title"],
+              date: doc.data()["date"],
             ))
         .toList();
+
     expenseList = data;
     notifyListeners();
     return expense;
+  }
+
+  Future<void> addBudget(String amount, String item, String date) async {
+    await firestore.collection("users/${currentUser!.uid}/budget").add({
+      "amount": amount,
+      "itemTitle": item,
+      "date": date,
+    });
+    notifyListeners();
+  }
+
+  Future<Budget> fetchBudget() async {
+    final snapshot =
+        await firestore.collection("users/${currentUser!.uid}/budget").get();
+    final data = snapshot.docs
+        .map((doc) => Budget(
+              id: doc.id,
+              title: doc.data()["itemTitle"],
+              amount: doc.data()["amount"],
+              date: doc.data()["date"],
+            ))
+        .toList();
+
+    budgetList = data;
+    notifyListeners();
+    return budget;
   }
 
   Future<Blog> fetchBlogs() async {
@@ -141,12 +175,28 @@ class FirebaseProvider with ChangeNotifier {
     return blog;
   }
 
+  Future<void> deleteBudget(String id) async {
+    await firestore
+        .collection("users/${currentUser!.uid}/budget")
+        .doc(id)
+        .delete();
+    notifyListeners();
+  }
+
   Future<void> getUserData() async {
     final snapshot = await firestore.doc("users/${currentUser!.uid}").get();
     final data = snapshot.data() as Map<String, dynamic>;
     name = data["name"];
     email = data["email"];
     balance = data["balance"].toString();
+    notifyListeners();
+  }
+
+  Future<void> editUserData(String name) async {
+    await firestore.doc("users/${currentUser!.uid}").update({
+      "name": name,
+    });
+
     notifyListeners();
   }
 }
